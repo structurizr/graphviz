@@ -1,2 +1,3 @@
-# graphviz
-Automatic layout facilities for Structurizr views
+# structurizr-graphviz
+
+This library provides automatic facilities for Structurizr views.

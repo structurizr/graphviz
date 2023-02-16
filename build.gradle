@@ -1,0 +1,94 @@
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+defaultTasks 'clean', 'compileJava', 'test'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'com.structurizr:structurizr-core:1.20.0'
+
+    testImplementation 'com.structurizr:structurizr-client:1.20.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+}
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+description = 'Automatic facilities for Structurizr views'
+group = 'com.structurizr'
+version = '1.7.0'
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title':   description,
+                'Implementation-Version': version
+        )
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "ossrh"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = findProperty('ossrhUsername')
+                password = findProperty('ossrhPassword')
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'structurizr-graphviz'
+                description = 'Automatic facilities for Structurizr views'
+                url = 'https://github.com/structurizr/graphviz'
+
+                scm {
+                    connection = 'scm:git:git://github.com/structurizr/graphviz.git'
+                    developerConnection = 'scm:git:git@github.com:structurizr/graphviz.git'
+                    url = 'https://github.com/structurizr/graphviz'
+                }
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = "simon"
+                        name = "Simon Brown"
+                        email = "simon@structurizr.com"
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
