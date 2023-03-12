@@ -21,7 +21,7 @@ class DotFileWriter {
     private static final String GROUP_SEPARATOR_PROPERTY_NAME = "structurizr.groupSeparator";
 
     private Locale locale = Locale.US;
-    private File path;
+    private final File path;
     private RankDirection rankDirection;
     private double rankSeparation;
     private double nodeSeparation;
