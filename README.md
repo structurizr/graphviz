@@ -25,7 +25,7 @@ Once the layout has been applied, you can upload your workspace to the Structuri
 
 ## Changelog
 
-### 1.8.0 (unreleased)
+### 1.8.0 (12th March 2023)
 
 - Adds support for nested groups.
 
