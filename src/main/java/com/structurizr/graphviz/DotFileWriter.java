@@ -18,6 +18,7 @@ class DotFileWriter {
 
     private static final int CLUSTER_INTERNAL_MARGIN = 25;
     private static final String INDENT = "  ";
+    private static final String GROUP_SEPARATOR_PROPERTY_NAME = "structurizr.groupSeparator";
 
     private Locale locale = Locale.US;
     private File path;
@@ -338,27 +339,89 @@ class DotFileWriter {
     }
 
     private void writeElements(ModelView view, String padding, Set<GroupableElement> elements, Writer writer) throws Exception {
-        Set<String> groups = new LinkedHashSet<>();
+        String groupSeparator = view.getModel().getProperties().get(GROUP_SEPARATOR_PROPERTY_NAME);
+        boolean nested = !StringUtils.isNullOrEmpty(groupSeparator);
+
+        Set<String> groups = new HashSet<>();
         for (GroupableElement element : elements) {
             String group = element.getGroup();
 
             if (!StringUtils.isNullOrEmpty(group)) {
                 groups.add(group);
+
+                if (nested) {
+                    while (group.contains(groupSeparator)) {
+                        group = group.substring(0, group.lastIndexOf(groupSeparator));
+                        groups.add(group);
+                    }
+                }
             }
         }
 
+        List<String> sortedGroups = new ArrayList<>(groups);
+        sortedGroups.sort(String::compareTo);
+
         // first render grouped elements
-        int groupId = 1;
-        for (String group : groups) {
-            writer.write(padding + "subgraph cluster_group_" + groupId + " {\n");
-            writer.write( padding + "  margin=" + CLUSTER_INTERNAL_MARGIN + "\n");
-            for (GroupableElement element : elements) {
-                if (group.equals(element.getGroup())) {
-                    writeElement(view, padding + INDENT, element, writer);
+        if (nested) {
+            if (groups.size() > 0) {
+                int groupId = 1;
+                String context = "";
+                for (String group : sortedGroups) {
+                    int groupCount = group.split(groupSeparator).length;
+                    int contextCount = context.split(groupSeparator).length;
+
+                    if (groupCount > contextCount) {
+                        // moved from a to a/b
+                        // - increase padding
+                        padding = padding + INDENT;
+                    } else if (groupCount == contextCount) {
+                        // moved from a/b to a/c
+                        // - close off previous subgraph
+                        if (groupCount > 1) {
+                            writer.write(padding + "}\n");
+                        }
+                    } else {
+                        // moved from a/b/c to a/b or a
+                        // - close off previous subgraphs
+                        // - close off current subgraph
+                        for (int i = 0; i < (contextCount - groupCount); i++) {
+                            writer.write(padding + "}\n");
+                            padding = padding.substring(0, padding.length() - INDENT.length());
+                        }
+                        writer.write(padding + "}\n");
+                    }
+
+                    writer.write(padding + "subgraph cluster_group_" + groupId + " {\n");
+//                    writer.write(padding + "  // " + group + "\n");
+                    writer.write(padding + "  margin=" + CLUSTER_INTERNAL_MARGIN + "\n");
+                    for (GroupableElement element : elements) {
+                        if (group.equals(element.getGroup())) {
+                            writeElement(view, padding + INDENT, element, writer);
+                        }
+                    }
+                    groupId++;
+                    context = group;
+                }
+
+                int contextCount = context.split(groupSeparator).length;
+                for (int i = 0; i < contextCount; i++) {
+                    writer.write(padding + "}\n");
+                    padding = padding.substring(0, padding.length() - INDENT.length());
                 }
             }
-            writer.write(padding + "}\n");
-            groupId++;
+        } else {
+            int groupId = 1;
+            for (String group : sortedGroups) {
+                writer.write(padding + "subgraph cluster_group_" + groupId + " {\n");
+                writer.write(padding + "  margin=" + CLUSTER_INTERNAL_MARGIN + "\n");
+                for (GroupableElement element : elements) {
+                    if (group.equals(element.getGroup())) {
+                        writeElement(view, padding + INDENT, element, writer);
+                    }
+                }
+                writer.write(padding + "}\n");
+                groupId++;
+            }
         }
 
         // then render ungrouped elements

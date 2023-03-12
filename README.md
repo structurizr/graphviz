@@ -25,6 +25,10 @@ Once the layout has been applied, you can upload your workspace to the Structuri
 
 ## Changelog
 
+### 1.8.0 (unreleased)
+
+- Adds support for nested groups.
+
 ### 1.7.0 (16th February 2023)
 
 - Updated to reflect breaking changes in `structurizr-core`.

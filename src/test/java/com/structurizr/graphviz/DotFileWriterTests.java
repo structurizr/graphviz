@@ -126,6 +126,69 @@ public class DotFileWriterTests {
     }
 
     @Test
+    public void test_writeSystemLandscapeViewWithNestedGroupedElements() throws Exception {
+        Workspace workspace = new Workspace("Name", "");
+        workspace.getModel().addProperty("structurizr.groupSeparator", "/");
+
+        SoftwareSystem a = workspace.getModel().addSoftwareSystem("A");
+        a.setGroup("Enterprise 1/Department 1/Team 1");
+
+        SoftwareSystem b = workspace.getModel().addSoftwareSystem("B");
+        b.setGroup("Enterprise 1/Department 1/Team 2");
+
+        SoftwareSystem c = workspace.getModel().addSoftwareSystem("C");
+        c.setGroup("Enterprise 1/Department 2");
+
+        SoftwareSystem d = workspace.getModel().addSoftwareSystem("D");
+        d.setGroup("Enterprise 2");
+
+        SystemLandscapeView view = workspace.getViews().createSystemLandscapeView("SystemLandscape", "");
+        view.addAllElements();
+
+        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
+        dotFileWriter.write(view);
+
+        File file = new File(PATH, "SystemLandscape.dot");
+        assertTrue(file.exists());
+
+        String content = new String(Files.readAllBytes(file.toPath()));
+        assertEquals("digraph {\n" +
+                "  compound=true\n" +
+                "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
+                "  node [shape=box,fontsize=5]\n" +
+                "  edge []\n" +
+                "\n" +
+                "  subgraph cluster_enterprise {\n" +
+                "    margin=25\n" +
+                "  }\n" +
+                "\n" +
+                "  subgraph cluster_group_1 {\n" +
+                "    margin=25\n" +
+                "    subgraph cluster_group_2 {\n" +
+                "      margin=25\n" +
+                "      subgraph cluster_group_3 {\n" +
+                "        margin=25\n" +
+                "        1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: A\"]\n" +
+                "      }\n" +
+                "      subgraph cluster_group_4 {\n" +
+                "        margin=25\n" +
+                "        2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: B\"]\n" +
+                "      }\n" +
+                "    }\n" +
+                "    subgraph cluster_group_5 {\n" +
+                "      margin=25\n" +
+                "      3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: C\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "  subgraph cluster_group_6 {\n" +
+                "    margin=25\n" +
+                "    4 [width=1.500000,height=1.000000,fixedsize=true,id=4,label=\"4: D\"]\n" +
+                "  }\n" +
+                "\n" +
+                "}", content);
+    }
+
+    @Test
     public void test_writeSystemLandscapeViewWithNoEnterpriseBoundaryInGermanLocale() throws Exception {
         // ranksep=1.0 was being output as ranksep=1,0
         Locale.setDefault(new Locale("de", "DE"));
@@ -204,7 +267,7 @@ public class DotFileWriterTests {
     }
 
     @Test
-    public void test_writeSystemContextViewWithNoEnterpiseBoundary() throws Exception {
+    public void test_writeSystemContextViewWithNoEnterpriseBoundary() throws Exception {
         Workspace workspace = new Workspace("Name", "");
         CustomElement box = workspace.getModel().addCustomElement("Box");
         Person user = workspace.getModel().addPerson("User", "");
