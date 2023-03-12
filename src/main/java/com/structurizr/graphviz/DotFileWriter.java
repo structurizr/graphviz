@@ -26,6 +26,8 @@ class DotFileWriter {
     private double rankSeparation;
     private double nodeSeparation;
 
+    private int groupId = 1;
+
     DotFileWriter(File path, RankDirection rankDirection, double rankSeparation, double nodeSeparation) {
         this.path = path;
         this.rankDirection = rankDirection;
@@ -364,7 +366,6 @@ class DotFileWriter {
         // first render grouped elements
         if (nested) {
             if (groups.size() > 0) {
-                int groupId = 1;
                 String context = "";
                 for (String group : sortedGroups) {
                     int groupCount = group.split(groupSeparator).length;
@@ -410,7 +411,6 @@ class DotFileWriter {
                 }
             }
         } else {
-            int groupId = 1;
             for (String group : sortedGroups) {
                 writer.write(padding + "subgraph cluster_group_" + groupId + " {\n");
                 writer.write(padding + "  margin=" + CLUSTER_INTERNAL_MARGIN + "\n");

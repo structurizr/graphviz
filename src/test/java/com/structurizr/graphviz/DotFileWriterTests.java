@@ -386,7 +386,7 @@ public class DotFileWriterTests {
     }
 
     @Test
-    public void test_writeContainerViewWithGroupedElements() throws Exception {
+    public void test_writeContainerViewWithGroupedElementsInASingleSoftwareSystem() throws Exception {
         Workspace workspace = new Workspace("Name", "");
         CustomElement box = workspace.getModel().addCustomElement("Box");
         SoftwareSystem softwareSystem = workspace.getModel().addSoftwareSystem("Software System", "");
@@ -432,6 +432,56 @@ public class DotFileWriterTests {
                 "\n" +
                 "  3 -> 4 [id=6]\n" +
                 "  4 -> 5 [id=7]\n" +
+                "}", content);
+    }
+
+    @Test
+    public void test_writeContainerViewWithGroupedElementsInMultipleSoftwareSystems() throws Exception {
+        Workspace workspace = new Workspace("Name", "");
+
+        SoftwareSystem softwareSystem1 = workspace.getModel().addSoftwareSystem("Software System 1");
+        Container container1 = softwareSystem1.addContainer("Container 1");
+        container1.setGroup("Group");
+
+        SoftwareSystem softwareSystem2 = workspace.getModel().addSoftwareSystem("Software System 2");
+        Container container2 = softwareSystem2.addContainer("Container 2");
+        container2.setGroup("Group");
+
+        container1.uses(container2, "Uses");
+
+        ContainerView view = workspace.getViews().createContainerView(softwareSystem1, "Containers", "");
+        view.add(container1);
+        view.add(container2);
+
+        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
+        dotFileWriter.write(view);
+
+        File file = new File(PATH, "Containers.dot");
+        assertTrue(file.exists());
+
+        String content = new String(Files.readAllBytes(file.toPath()));
+        assertEquals("digraph {\n" +
+                "  compound=true\n" +
+                "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
+                "  node [shape=box,fontsize=5]\n" +
+                "  edge []\n" +
+                "\n" +
+                "  subgraph cluster_1 {\n" +
+                "    margin=25\n" +
+                "    subgraph cluster_group_1 {\n" +
+                "      margin=25\n" +
+                "      2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: Container 1\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "  subgraph cluster_3 {\n" +
+                "    margin=25\n" +
+                "    subgraph cluster_group_2 {\n" +
+                "      margin=25\n" +
+                "      4 [width=1.500000,height=1.000000,fixedsize=true,id=4,label=\"4: Container 2\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "\n" +
+                "  2 -> 4 [id=5]\n" +
                 "}", content);
     }
 
