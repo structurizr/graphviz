@@ -163,8 +163,10 @@ class DotFileWriter {
                 softwareSystems.add((SoftwareSystem)elementView.getElement().getParent());
             }
         }
+        List<SoftwareSystem> sortedSoftwareSystems = new ArrayList<>(softwareSystems);
+        sortedSoftwareSystems.sort(Comparator.comparing(Element::getId));
 
-        for (SoftwareSystem softwareSystem : softwareSystems) {
+        for (SoftwareSystem softwareSystem : sortedSoftwareSystems) {
             fileWriter.write(String.format(locale, "  subgraph cluster_%s {\n", softwareSystem.getId()));
             fileWriter.write("    margin=" + CLUSTER_INTERNAL_MARGIN + "\n");
 
@@ -202,8 +204,10 @@ class DotFileWriter {
                 containers.add((Container)elementView.getElement().getParent());
             }
         }
+        List<Container> sortedContainers = new ArrayList<>(containers);
+        sortedContainers.sort(Comparator.comparing(Element::getId));
 
-        for (Container container : containers) {
+        for (Container container : sortedContainers) {
             fileWriter.write(String.format(locale, "  subgraph cluster_%s {\n", container.getId()));
             fileWriter.write("    margin=" + CLUSTER_INTERNAL_MARGIN + "\n");
 
@@ -378,7 +382,7 @@ class DotFileWriter {
                     } else if (groupCount == contextCount) {
                         // moved from a/b to a/c
                         // - close off previous subgraph
-                        if (groupCount > 1) {
+                        if (context.length() > 0) {
                             writer.write(padding + "}\n");
                         }
                     } else {

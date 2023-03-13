@@ -25,9 +25,10 @@ Once the layout has been applied, you can upload your workspace to the Structuri
 
 ## Changelog
 
-### 1.8.1 (unreleased)
+### 1.8.1 (13th March 2023)
 
 - Fixes warning about clusters with the same name.
+- Fixes an issue when nested groups are configured, but groups are not nested.
 
 ### 1.8.0 (12th March 2023)
 

@@ -536,4 +536,57 @@ public class DotFileWriterTests {
                 "}", content);
     }
 
+    @Test
+    public void test_writeContainerViewWithGroupedElements_WithAndWithoutAGroupSeparator() throws Exception {
+        Workspace workspace = new Workspace("Name", "");
+        SoftwareSystem softwareSystem = workspace.getModel().addSoftwareSystem("Software System", "");
+        Container container1 = softwareSystem.addContainer("Container 1");
+        container1.setGroup("Group 1");
+        Container container2 = softwareSystem.addContainer("Container 2");
+        container2.setGroup("Group 2");
+
+        ContainerView view = workspace.getViews().createContainerView(softwareSystem, "Containers", "");
+        view.addAllElements();
+
+        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
+        dotFileWriter.write(view);
+
+        File file = new File(PATH, "Containers.dot");
+        assertTrue(file.exists());
+
+        String expectedResult = "digraph {\n" +
+                "  compound=true\n" +
+                "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
+                "  node [shape=box,fontsize=5]\n" +
+                "  edge []\n" +
+                "\n" +
+                "  subgraph cluster_1 {\n" +
+                "    margin=25\n" +
+                "    subgraph cluster_group_1 {\n" +
+                "      margin=25\n" +
+                "      2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: Container 1\"]\n" +
+                "    }\n" +
+                "    subgraph cluster_group_2 {\n" +
+                "      margin=25\n" +
+                "      3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: Container 2\"]\n" +
+                "    }\n" +
+                "  }\n" +
+                "\n" +
+                "}";
+
+        String content = new String(Files.readAllBytes(file.toPath()));
+        assertEquals(expectedResult, content);
+
+        // this should be the same
+        workspace.getModel().addProperty("structurizr.groupSeparator", "/");
+        dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
+        dotFileWriter.write(view);
+
+        file = new File(PATH, "Containers.dot");
+        assertTrue(file.exists());
+
+        content = new String(Files.readAllBytes(file.toPath()));
+        assertEquals(expectedResult, content);
+    }
+
 }
