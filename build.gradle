@@ -9,9 +9,9 @@ repositories {
 }
 
 dependencies {
-    api 'com.structurizr:structurizr-core:1.23.0'
+    api 'com.structurizr:structurizr-export:1.14.0'
 
-    testImplementation 'com.structurizr:structurizr-client:1.23.0'
+    testImplementation 'com.structurizr:structurizr-client:1.24.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 
@@ -23,7 +23,7 @@ targetCompatibility = 1.8
 
 description = 'Automatic facilities for Structurizr views'
 group = 'com.structurizr'
-version = '1.8.1'
+version = '2.0.0'
 
 test {
     useJUnitPlatform()

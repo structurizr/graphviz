@@ -1,23 +1,21 @@
 package com.structurizr.graphviz;
 
 import com.structurizr.Workspace;
+import com.structurizr.export.Diagram;
 import com.structurizr.model.*;
+import com.structurizr.util.WorkspaceUtils;
 import com.structurizr.view.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DotFileWriterTests {
-
-    private static final File PATH = new File("./build/");
+public class DOTExporterTests {
 
     @Test
-    public void test_writeCustomView() throws Exception {
+    public void test_writeCustomView() {
         Workspace workspace = new Workspace("Name", "");
         CustomElement box1 = workspace.getModel().addCustomElement("Box 1");
         CustomElement box2 = workspace.getModel().addCustomElement("Box 2");
@@ -27,13 +25,10 @@ public class DotFileWriterTests {
         view.add(box1);
         view.add(box2);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "CustomView.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -48,7 +43,7 @@ public class DotFileWriterTests {
     }
 
     @Test
-    public void test_writeSystemLandscapeViewWithNoEnterpriseBoundary() throws Exception {
+    public void test_writeSystemLandscapeViewWithNoEnterpriseBoundary() {
         Workspace workspace = new Workspace("Name", "");
         CustomElement box = workspace.getModel().addCustomElement("Box");
         Person user = workspace.getModel().addPerson("User", "");
@@ -62,13 +57,10 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(false);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemLandscape.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -98,27 +90,26 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(false);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemLandscape.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
                 "  node [shape=box,fontsize=5]\n" +
                 "  edge []\n" +
                 "\n" +
-                "  subgraph cluster_group_1 {\n" +
+                "  subgraph \"cluster_group_1\" {\n" +
                 "    margin=25\n" +
                 "    2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: User\"]\n" +
                 "  }\n" +
-                "  subgraph cluster_group_2 {\n" +
+                "\n" +
+                "  subgraph \"cluster_group_2\" {\n" +
                 "    margin=25\n" +
                 "    3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: Software System\"]\n" +
                 "  }\n" +
+                "\n" +
                 "  1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: Box\"]\n" +
                 "\n" +
                 "  2 -> 3 [id=4]\n" +
@@ -145,45 +136,44 @@ public class DotFileWriterTests {
         SystemLandscapeView view = workspace.getViews().createSystemLandscapeView("SystemLandscape", "");
         view.addAllElements();
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemLandscape.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
                 "  node [shape=box,fontsize=5]\n" +
                 "  edge []\n" +
                 "\n" +
-                "  subgraph cluster_enterprise {\n" +
+                "  subgraph \"cluster_group_1\" {\n" +
                 "    margin=25\n" +
+                "      subgraph \"cluster_group_2\" {\n" +
+                "        margin=25\n" +
+                "          subgraph \"cluster_group_3\" {\n" +
+                "            margin=25\n" +
+                "            1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: A\"]\n" +
+                "          }\n" +
+                "\n" +
+                "          subgraph \"cluster_group_4\" {\n" +
+                "            margin=25\n" +
+                "            2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: B\"]\n" +
+                "          }\n" +
+                "\n" +
+                "      }\n" +
+                "\n" +
+                "      subgraph \"cluster_group_5\" {\n" +
+                "        margin=25\n" +
+                "        3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: C\"]\n" +
+                "      }\n" +
+                "\n" +
                 "  }\n" +
                 "\n" +
-                "  subgraph cluster_group_1 {\n" +
-                "    margin=25\n" +
-                "    subgraph cluster_group_2 {\n" +
-                "      margin=25\n" +
-                "      subgraph cluster_group_3 {\n" +
-                "        margin=25\n" +
-                "        1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: A\"]\n" +
-                "      }\n" +
-                "      subgraph cluster_group_4 {\n" +
-                "        margin=25\n" +
-                "        2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: B\"]\n" +
-                "      }\n" +
-                "    }\n" +
-                "    subgraph cluster_group_5 {\n" +
-                "      margin=25\n" +
-                "      3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: C\"]\n" +
-                "    }\n" +
-                "  }\n" +
-                "  subgraph cluster_group_6 {\n" +
+                "  subgraph \"cluster_group_6\" {\n" +
                 "    margin=25\n" +
                 "    4 [width=1.500000,height=1.000000,fixedsize=true,id=4,label=\"4: D\"]\n" +
                 "  }\n" +
+                "\n" +
                 "\n" +
                 "}", content);
     }
@@ -205,13 +195,10 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(false);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemLandscape.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -241,13 +228,10 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(true);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemLandscape.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -281,13 +265,10 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(false);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemContext.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -318,13 +299,10 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(true);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemContext.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -358,27 +336,26 @@ public class DotFileWriterTests {
         view.add(box);
         view.setEnterpriseBoundaryVisible(false);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "SystemContext.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
                 "  node [shape=box,fontsize=5]\n" +
                 "  edge []\n" +
                 "\n" +
-                "  subgraph cluster_group_1 {\n" +
+                "  subgraph \"cluster_group_1\" {\n" +
                 "    margin=25\n" +
                 "    2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: User\"]\n" +
                 "  }\n" +
-                "  subgraph cluster_group_2 {\n" +
+                "\n" +
+                "  subgraph \"cluster_group_2\" {\n" +
                 "    margin=25\n" +
                 "    3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: Software System\"]\n" +
                 "  }\n" +
+                "\n" +
                 "  1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: Box\"]\n" +
                 "\n" +
                 "  2 -> 3 [id=4]\n" +
@@ -403,32 +380,32 @@ public class DotFileWriterTests {
         view.addAllElements();
         view.add(box);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "Containers.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
                 "  node [shape=box,fontsize=5]\n" +
                 "  edge []\n" +
                 "\n" +
+                "  1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: Box\"]\n" +
+                "\n" +
                 "  subgraph cluster_2 {\n" +
                 "    margin=25\n" +
-                "    subgraph cluster_group_1 {\n" +
+                "    subgraph \"cluster_group_1\" {\n" +
                 "      margin=25\n" +
                 "      3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: Container 1\"]\n" +
                 "    }\n" +
-                "    subgraph cluster_group_2 {\n" +
+                "\n" +
+                "    subgraph \"cluster_group_2\" {\n" +
                 "      margin=25\n" +
                 "      4 [width=1.500000,height=1.000000,fixedsize=true,id=4,label=\"4: Container 2\"]\n" +
                 "    }\n" +
+                "\n" +
                 "    5 [width=1.500000,height=1.000000,fixedsize=true,id=5,label=\"5: Container 3\"]\n" +
                 "  }\n" +
-                "  1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: Box\"]\n" +
                 "\n" +
                 "  3 -> 4 [id=6]\n" +
                 "  4 -> 5 [id=7]\n" +
@@ -453,13 +430,10 @@ public class DotFileWriterTests {
         view.add(container1);
         view.add(container2);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "Containers.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
@@ -468,17 +442,20 @@ public class DotFileWriterTests {
                 "\n" +
                 "  subgraph cluster_1 {\n" +
                 "    margin=25\n" +
-                "    subgraph cluster_group_1 {\n" +
+                "    subgraph \"cluster_group_1\" {\n" +
                 "      margin=25\n" +
                 "      2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: Container 1\"]\n" +
                 "    }\n" +
+                "\n" +
                 "  }\n" +
+                "\n" +
                 "  subgraph cluster_3 {\n" +
                 "    margin=25\n" +
-                "    subgraph cluster_group_2 {\n" +
+                "    subgraph \"cluster_group_2\" {\n" +
                 "      margin=25\n" +
                 "      4 [width=1.500000,height=1.000000,fixedsize=true,id=4,label=\"4: Container 2\"]\n" +
                 "    }\n" +
+                "\n" +
                 "  }\n" +
                 "\n" +
                 "  2 -> 4 [id=5]\n" +
@@ -504,32 +481,32 @@ public class DotFileWriterTests {
         view.addAllElements();
         view.add(box);
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "Components.dot");
-        assertTrue(file.exists());
-
-        String content = new String(Files.readAllBytes(file.toPath()));
+        String content = diagram.getDefinition();
         assertEquals("digraph {\n" +
                 "  compound=true\n" +
                 "  graph [splines=polyline,rankdir=TB,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
                 "  node [shape=box,fontsize=5]\n" +
                 "  edge []\n" +
                 "\n" +
+                "  1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: Box\"]\n" +
+                "\n" +
                 "  subgraph cluster_3 {\n" +
                 "    margin=25\n" +
-                "    subgraph cluster_group_1 {\n" +
+                "    subgraph \"cluster_group_1\" {\n" +
                 "      margin=25\n" +
                 "      5 [width=1.500000,height=1.000000,fixedsize=true,id=5,label=\"5: Component 2\"]\n" +
                 "    }\n" +
-                "    subgraph cluster_group_2 {\n" +
+                "\n" +
+                "    subgraph \"cluster_group_2\" {\n" +
                 "      margin=25\n" +
                 "      6 [width=1.500000,height=1.000000,fixedsize=true,id=6,label=\"6: Component 3\"]\n" +
                 "    }\n" +
+                "\n" +
                 "    4 [width=1.500000,height=1.000000,fixedsize=true,id=4,label=\"4: Component 1\"]\n" +
                 "  }\n" +
-                "  1 [width=1.500000,height=1.000000,fixedsize=true,id=1,label=\"1: Box\"]\n" +
                 "\n" +
                 "  4 -> 5 [id=7]\n" +
                 "  5 -> 6 [id=8]\n" +
@@ -548,11 +525,10 @@ public class DotFileWriterTests {
         ContainerView view = workspace.getViews().createContainerView(softwareSystem, "Containers", "");
         view.addAllElements();
 
-        DotFileWriter dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(view);
 
-        File file = new File(PATH, "Containers.dot");
-        assertTrue(file.exists());
+        String content = diagram.getDefinition();
 
         String expectedResult = "digraph {\n" +
                 "  compound=true\n" +
@@ -562,31 +538,80 @@ public class DotFileWriterTests {
                 "\n" +
                 "  subgraph cluster_1 {\n" +
                 "    margin=25\n" +
-                "    subgraph cluster_group_1 {\n" +
+                "    subgraph \"cluster_group_1\" {\n" +
                 "      margin=25\n" +
                 "      2 [width=1.500000,height=1.000000,fixedsize=true,id=2,label=\"2: Container 1\"]\n" +
                 "    }\n" +
-                "    subgraph cluster_group_2 {\n" +
+                "\n" +
+                "    subgraph \"cluster_group_2\" {\n" +
                 "      margin=25\n" +
                 "      3 [width=1.500000,height=1.000000,fixedsize=true,id=3,label=\"3: Container 2\"]\n" +
                 "    }\n" +
+                "\n" +
                 "  }\n" +
                 "\n" +
                 "}";
 
-        String content = new String(Files.readAllBytes(file.toPath()));
         assertEquals(expectedResult, content);
 
         // this should be the same
         workspace.getModel().addProperty("structurizr.groupSeparator", "/");
-        dotFileWriter = new DotFileWriter(PATH, RankDirection.TopBottom, 300, 300);
-        dotFileWriter.write(view);
+        exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        diagram = exporter.export(view);
 
-        file = new File(PATH, "Containers.dot");
-        assertTrue(file.exists());
-
-        content = new String(Files.readAllBytes(file.toPath()));
+        content = diagram.getDefinition();
         assertEquals(expectedResult, content);
+    }
+
+    @Test
+    public void test_AmazonWebServicesExample() throws Exception {
+        Workspace workspace = WorkspaceUtils.loadWorkspaceFromJson(new File("src/test/structurizr-54915-workspace.json"));
+        DOTExporter exporter = new DOTExporter(RankDirection.TopBottom, 300, 300);
+        Diagram diagram = exporter.export(workspace.getViews().getDeploymentViews().iterator().next());
+
+        String content = diagram.getDefinition();
+
+        String expectedResult = "digraph {\n" +
+                "  compound=true\n" +
+                "  graph [splines=polyline,rankdir=LR,ranksep=1.0,nodesep=1.0,fontsize=5]\n" +
+                "  node [shape=box,fontsize=5]\n" +
+                "  edge []\n" +
+                "\n" +
+                "  subgraph cluster_5 {\n" +
+                "    margin=25\n" +
+                "    subgraph cluster_6 {\n" +
+                "      margin=25\n" +
+                "      subgraph cluster_12 {\n" +
+                "        margin=25\n" +
+                "        subgraph cluster_13 {\n" +
+                "          margin=25\n" +
+                "          14 [width=1.500000,height=1.000000,fixedsize=true,id=14,label=\"14: Database\"]\n" +
+                "        }\n" +
+                "\n" +
+                "      }\n" +
+                "\n" +
+                "      7 [width=1.500000,height=1.000000,fixedsize=true,id=7,label=\"7: Route 53\"]\n" +
+                "      8 [width=1.500000,height=1.000000,fixedsize=true,id=8,label=\"8: Elastic Load Balancer\"]\n" +
+                "      subgraph cluster_9 {\n" +
+                "        margin=25\n" +
+                "        subgraph cluster_10 {\n" +
+                "          margin=25\n" +
+                "          11 [width=1.500000,height=1.000000,fixedsize=true,id=11,label=\"11: Web Application\"]\n" +
+                "        }\n" +
+                "\n" +
+                "      }\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "  }\n" +
+                "\n" +
+                "  11 -> 14 [id=15]\n" +
+                "  7 -> 8 [id=16]\n" +
+                "  8 -> 11 [id=17]\n" +
+                "}";
+
+        assertEquals(expectedResult, content);
+
     }
 
 }

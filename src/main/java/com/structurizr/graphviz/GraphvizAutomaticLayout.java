@@ -1,9 +1,13 @@
 package com.structurizr.graphviz;
 
 import com.structurizr.Workspace;
+import com.structurizr.export.Diagram;
 import com.structurizr.view.*;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Locale;
 
 /**
@@ -13,7 +17,9 @@ import java.util.Locale;
  */
 public class GraphvizAutomaticLayout {
 
-    private File path;
+    private static final String DOT_FILE_EXTENSION = ".dot";
+
+    private final File path;
 
     private RankDirection rankDirection = RankDirection.TopBottom;
     private double rankSeparation = 1.0;
@@ -61,11 +67,19 @@ public class GraphvizAutomaticLayout {
         this.locale = locale;
     }
 
-    private DotFileWriter createDotFileWriter() {
-        DotFileWriter dotFileWriter = new DotFileWriter(path, rankDirection, rankSeparation, nodeSeparation);
-        dotFileWriter.setLocale(locale);
+    private DOTExporter createDOTExporter() {
+        DOTExporter exporter = new DOTExporter(rankDirection, rankSeparation, nodeSeparation);
+        exporter.setLocale(locale);
 
-        return dotFileWriter;
+        return exporter;
+    }
+
+    private void writeFile(Diagram diagram) throws Exception {
+        File file = new File(path, diagram.getKey() + DOT_FILE_EXTENSION);
+        BufferedWriter writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8);
+        writer.write(diagram.getDefinition());
+        writer.flush();
+        writer.close();
     }
 
     private SVGReader createSVGReader() {
@@ -74,50 +88,57 @@ public class GraphvizAutomaticLayout {
 
     private void runGraphviz(View view) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder().inheritIO();
-        processBuilder.command("dot", new File(path, view.getKey() + ".dot").getAbsolutePath(), "-Tsvg", "-O");
+        processBuilder.command("dot", new File(path, view.getKey() + DOT_FILE_EXTENSION).getAbsolutePath(), "-Tsvg", "-O");
         Process process = processBuilder.start();
         int exitCode = process.waitFor();
         assert exitCode == 0;
     }
 
     public void apply(CustomView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
 
     public void apply(SystemLandscapeView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
 
     public void apply(SystemContextView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
 
     public void apply(ContainerView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
 
     public void apply(ComponentView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
 
     public void apply(DynamicView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
 
     public void apply(DeploymentView view) throws Exception {
-        createDotFileWriter().write(view);
+        Diagram diagram = createDOTExporter().export(view);
+        writeFile(diagram);
         runGraphviz(view);
         createSVGReader().parseAndApplyLayout(view);
     }
