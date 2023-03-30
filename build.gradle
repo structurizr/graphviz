@@ -12,7 +12,7 @@ dependencies {
     api 'com.structurizr:structurizr-core:1.23.0'
 
     testImplementation 'com.structurizr:structurizr-client:1.23.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 
 compileJava.options.encoding = 'UTF-8'
