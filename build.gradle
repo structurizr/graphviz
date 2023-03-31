@@ -21,7 +21,7 @@ compileTestJava.options.encoding = 'UTF-8'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-description = 'Automatic facilities for Structurizr views'
+description = 'Automatic layout facilities for Structurizr views'
 group = 'com.structurizr'
 version = '2.0.0'
 
@@ -61,7 +61,7 @@ publishing {
 
             pom {
                 name = 'structurizr-graphviz'
-                description = 'Automatic facilities for Structurizr views'
+                description = 'Automatic layout facilities for Structurizr views'
                 url = 'https://github.com/structurizr/graphviz'
 
                 scm {

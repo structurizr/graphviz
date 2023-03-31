@@ -611,7 +611,6 @@ public class DOTExporterTests {
                 "}";
 
         assertEquals(expectedResult, content);
-
     }
 
 }
