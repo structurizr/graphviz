@@ -2,7 +2,7 @@
 
 ## 2.0.0 (31st March 2023)
 
-- Switched to using the [https://github.com/structurizr/export](structurizr-export library) for generating DOT files. 
+- Switched to using the [structurizr-export library](https://github.com/structurizr/export) for generating DOT files. 
 
 ## 1.8.1 (13th March 2023)
 
