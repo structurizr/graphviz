@@ -39,19 +39,23 @@ class DOTExporter extends AbstractDiagramExporter {
     @Override
     protected void writeHeader(ModelView view, IndentingWriter writer) {
         if (view.getAutomaticLayout() != null) {
-            switch (view.getAutomaticLayout().getRankDirection()) {
-                case TopBottom:
-                    rankDirection = RankDirection.TopBottom;
-                    break;
-                case BottomTop:
-                    rankDirection = RankDirection.BottomTop;
-                    break;
-                case LeftRight:
-                    rankDirection = RankDirection.LeftRight;
-                    break;
-                case RightLeft:
-                    rankDirection = RankDirection.RightLeft;
-                    break;
+            if (view.getAutomaticLayout().getRankDirection() == null) {
+                rankDirection = RankDirection.TopBottom;
+            } else {
+                switch (view.getAutomaticLayout().getRankDirection()) {
+                    case TopBottom:
+                        rankDirection = RankDirection.TopBottom;
+                        break;
+                    case BottomTop:
+                        rankDirection = RankDirection.BottomTop;
+                        break;
+                    case LeftRight:
+                        rankDirection = RankDirection.LeftRight;
+                        break;
+                    case RightLeft:
+                        rankDirection = RankDirection.RightLeft;
+                        break;
+                }
             }
 
             rankSeparation = view.getAutomaticLayout().getRankSeparation();

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1 (5th June 2023)
+
+- Fixes an issue with some older client libraries not setting the rank direction.
+
 ## 2.0.0 (31st March 2023)
 
 - Switched to using the [structurizr-export library](https://github.com/structurizr/export) for generating DOT files. 
