@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 (6th July 2023)
+
+- Adds some debug to help diagnose problems with running Graphviz.
+
 ## 2.0.1 (5th June 2023)
 
 - Fixes an issue with some older client libraries not setting the rank direction.
