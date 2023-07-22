@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (25th July 2023)
+
+- Updates dependencies.
+
 ## 2.1.0 (6th July 2023)
 
 - Adds some debug to help diagnose problems with running Graphviz.
