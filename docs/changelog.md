@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.1 (11th August 2023)
+
+- structurizr/export: Updated to 1.16.1 - [changelog](https://github.com/structurizr/export/releases/tag/v1.16.1).
+
 ## 2.2.0 (25th July 2023)
 
 - Updates dependencies.
