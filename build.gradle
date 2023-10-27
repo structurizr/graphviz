@@ -9,21 +9,21 @@ repositories {
 }
 
 dependencies {
-    api 'com.structurizr:structurizr-export:1.16.1'
+    api 'com.structurizr:structurizr-export:1.17.0'
 
-    testImplementation 'com.structurizr:structurizr-client:1.25.0'
+    testImplementation 'com.structurizr:structurizr-client:1.27.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 17
+targetCompatibility = 17
 
 description = 'Automatic layout facilities for Structurizr views'
 group = 'com.structurizr'
-version = '2.2.1'
+version = '2.2.2'
 
 test {
     useJUnitPlatform()

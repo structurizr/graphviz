@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.2 (27th October 2023)
+
+- structurizr/java: Updated to 1.27.0 - [changelog](https://github.com/structurizr/java/releases/tag/v1.27.0).
+- structurizr/export: Updated to 1.17.0 - [changelog](https://github.com/structurizr/export/releases/tag/v1.17.0).
+
 ## 2.2.1 (11th August 2023)
 
 - structurizr/export: Updated to 1.16.1 - [changelog](https://github.com/structurizr/export/releases/tag/v1.16.1).
